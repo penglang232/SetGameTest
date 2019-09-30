@@ -81,7 +81,39 @@ public class BigNumber {
 		return sb.toString();
 	}
 
+	public void add(BigNumber num) {
+		int i = 0;
+		digitMap.put(i++, calcInteger(getRest(), num.getRest()));
+		digitMap.put(i++, calcInteger(getK(), num.getK())+calcCarry(getRest(), num.getRest()));
+		digitMap.put(i++, calcInteger(getM(), num.getM())+calcCarry(getK(), num.getK()));
+		digitMap.put(i++, calcInteger(getB(), num.getB())+calcCarry(getM(), num.getM()));
+		digitMap.put(i++, calcInteger(getT(), num.getT())+calcCarry(getB(), num.getB()));
+		digitMap.put(i++, calcInteger(getq(), num.getq())+calcCarry(getT(), num.getT()));
+		digitMap.put(i++, calcInteger(getQ(), num.getQ())+calcCarry(getq(), num.getq()));
+		digitMap.put(i++, calcInteger(gets(), num.gets())+calcCarry(getQ(), num.getQ()));
+		digitMap.put(i++, calcInteger(getS(), num.getS())+calcCarry(gets(), num.gets()));
+		digitMap.put(i++, calcInteger(getO(), num.getO())+calcCarry(getS(), num.getS()));
+	}                                                                              
+	
+	public int calcInteger(int num1, int num2) {
+		if(num1==-1&&num2==-1) {
+			return -1;
+		}else if(num1==-1&&num2!=-1){
+			return num2;
+		}else if(num1!=-1&&num2==-1){
+			return num1;
+		}else {
+			return (num1+num2)%1000;
+		}
+	}
 
+	public int calcCarry(int num1, int num2) {
+		if(num1!=-1&&num2!=-1) {
+			return (num1+num2)/1000;
+		}else {
+			return 0;
+		}
+	}
 
 	public static void main(String[] args) {
 //		long start = System.currentTimeMillis();
@@ -103,8 +135,11 @@ public class BigNumber {
 //		System.out.println((System.currentTimeMillis() - start) + " ms");
 		
 		BigNumber bit = new BigNumber("12345678987654321");
+		BigNumber bit2 = new BigNumber("901");
 		System.out.println(bit.toString());
-		System.out.println(bit.getRest());
-		System.out.println(bit.getO());
+		bit.add(bit2);
+		System.out.println(bit.toString());
+//		System.out.println(bit.getRest());
+//		System.out.println(bit.getO());
 	}
 }
