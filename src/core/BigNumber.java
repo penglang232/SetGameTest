@@ -1,5 +1,6 @@
 package core;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class BigNumber {
 //	int S;
 //	int O;
 	
-	Map<Integer,Integer> digitMap = new HashMap<Integer,Integer>();
+	private Map<Integer,Integer> digitMap = new HashMap<Integer,Integer>();
 	
 	public BigNumber(String str) {
 		int j=0;
@@ -38,108 +39,189 @@ public class BigNumber {
 		
 	}
 	
+	public Map<Integer, Integer> getDigitMap() {
+		return digitMap;
+	}
+
 	public int getRest() {
-		return digitMap.containsKey(0) ? digitMap.get(0) : -1;
+		return digitMap.containsKey(0) ? digitMap.get(0) : 0;
 	}
 	public int getK() {
-		return digitMap.containsKey(1) ? digitMap.get(1) : -1;
+		return digitMap.containsKey(1) ? digitMap.get(1) : 0;
 	}
 	public int getM() {
-		return digitMap.containsKey(2) ? digitMap.get(2) : -1;
+		return digitMap.containsKey(2) ? digitMap.get(2) : 0;
 	}
 	public int getB() {
-		return digitMap.containsKey(3) ? digitMap.get(3) : -1;
+		return digitMap.containsKey(3) ? digitMap.get(3) : 0;
 	}
 	public int getT() {
-		return digitMap.containsKey(4) ? digitMap.get(4) : -1;
+		return digitMap.containsKey(4) ? digitMap.get(4) : 0;
 	}
 	public int getq() {
-		return digitMap.containsKey(5) ? digitMap.get(5) : -1;
+		return digitMap.containsKey(5) ? digitMap.get(5) : 0;
 	}
 	public int getQ() {
-		return digitMap.containsKey(6) ? digitMap.get(6) : -1;
+		return digitMap.containsKey(6) ? digitMap.get(6) : 0;
 	}
 	public int gets() {
-		return digitMap.containsKey(7) ? digitMap.get(7) : -1;
+		return digitMap.containsKey(7) ? digitMap.get(7) : 0;
 	}
 	public int getS() {
-		return digitMap.containsKey(8) ? digitMap.get(8) : -1;
+		return digitMap.containsKey(8) ? digitMap.get(8) : 0;
 	}
 	public int getO() {
-		return digitMap.containsKey(9) ? digitMap.get(9) : -1;
+		return digitMap.containsKey(9) ? digitMap.get(9) : 0;
+	}
+	public int getDigit(int index) {
+		return digitMap.containsKey(index) ? digitMap.get(index) : 0;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		int len = digitMap.size();
+		boolean hasNum = false;
+		
 		for(int i=len-1;i>=0;i--){
 			int temp = digitMap.get(i);
-			if(temp >= 0)
-				sb.append(temp);
+			if(temp>0) {
+				hasNum = true;
+			}
+			if(hasNum) {
+				if(i == len-1) {
+					sb.append(temp);
+				}else {
+					sb.append(formatNum(temp));
+				}
+			}
+		}
+		if(sb.length()==0) {
+			sb.append("0");
 		}
 		return sb.toString();
 	}
 
-	public void add(BigNumber num) {
-		int i = 0;
-		digitMap.put(i++, calcInteger(getRest(), num.getRest()));
-		digitMap.put(i++, calcInteger(getK(), num.getK())+calcCarry(getRest(), num.getRest()));
-		digitMap.put(i++, calcInteger(getM(), num.getM())+calcCarry(getK(), num.getK()));
-		digitMap.put(i++, calcInteger(getB(), num.getB())+calcCarry(getM(), num.getM()));
-		digitMap.put(i++, calcInteger(getT(), num.getT())+calcCarry(getB(), num.getB()));
-		digitMap.put(i++, calcInteger(getq(), num.getq())+calcCarry(getT(), num.getT()));
-		digitMap.put(i++, calcInteger(getQ(), num.getQ())+calcCarry(getq(), num.getq()));
-		digitMap.put(i++, calcInteger(gets(), num.gets())+calcCarry(getQ(), num.getQ()));
-		digitMap.put(i++, calcInteger(getS(), num.getS())+calcCarry(gets(), num.gets()));
-		digitMap.put(i++, calcInteger(getO(), num.getO())+calcCarry(getS(), num.getS()));
-	}                                                                              
+	private String formatNum(int temp) {
+		String result = String.valueOf(temp);
+		while(result.length()<3) {
+			result = "0" + result;
+		}
+		return result;
+	}
 	
-	public int calcInteger(int num1, int num2) {
-		if(num1==-1&&num2==-1) {
+	public int compareTo(BigNumber num) {
+		int len = digitMap.size();
+		int lenNum = num.getDigitMap().size();
+		if(len>lenNum) {
+			return 1;
+		}else if(len>lenNum) {
 			return -1;
-		}else if(num1==-1&&num2!=-1){
-			return num2;
-		}else if(num1!=-1&&num2==-1){
-			return num1;
 		}else {
-			return (num1+num2)%1000;
+			for(int i = 0;i<len;i++) {
+				if(getDigit(i)>num.getDigit(i)) {
+					return 1;
+				}else if(getDigit(i)<num.getDigit(i)) {
+					return -1;
+				}
+			}
+		}
+		return 0;
+	}
+
+	public void add(BigNumber num) {
+		int len = digitMap.size();
+		int lenNum = num.getDigitMap().size();
+		int carry = 0;
+		int add = 0;
+		len = len >= lenNum ? len : lenNum;
+		int i = 0;
+		for(;i<len;i++) {
+			add = getDigit(i)+num.getDigit(i)+carry;
+			digitMap.put(i, add%1000);
+			carry = add/1000;
+		}
+		if(carry!=0) {
+			digitMap.put(i, carry);
+		}
+	}
+	
+	public void sub(BigNumber num) throws Exception {
+		if(compareTo(num)<0) {
+			throw new Exception("无法计算负数");
+		}
+		int len = digitMap.size();
+		int lenNum = num.getDigitMap().size();
+		int carry = 0;
+		int preCarry = 0;
+		int sub = 0;
+		len = len >= lenNum ? len : lenNum;
+		int i = 0;
+		for(;i<len;i++) {
+			if(getDigit(i)<(num.getDigit(i)-carry)) {
+				sub = getDigit(i)-num.getDigit(i)+carry;
+				preCarry=0;
+				while(sub<0) {
+					sub+=1000;
+					preCarry++;
+				}
+				preCarry = -1*preCarry;
+			}else {
+				sub = getDigit(i)-num.getDigit(i)+carry;
+				preCarry = 0;
+			}
+			digitMap.put(i, sub);
+			carry = preCarry;
+		}
+		if(carry!=0) {
+			digitMap.put(i, carry);
 		}
 	}
 
-	public int calcCarry(int num1, int num2) {
-		if(num1!=-1&&num2!=-1) {
-			return (num1+num2)/1000;
-		}else {
-			return 0;
+	public void multi(BigNumber num) {
+		int len = digitMap.size();
+		int lenNum = num.getDigitMap().size();
+		int carry = 0;
+		int multi = 0;
+		len = len >= lenNum ? len : lenNum;
+		int i = 0;
+		for(;i<len;i++) {
+			multi = getDigit(i)*num.getDigit(i)+carry;
+			digitMap.put(i, multi%1000);
+			carry = multi/1000;
+		}
+		if(carry!=0) {
+			digitMap.put(i, carry);
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+//		int times = 1000000;
 //		long start = System.currentTimeMillis();
-//		BigInteger bi1 = new BigInteger("12345678987654321");
-//		BigInteger bi2 = new BigInteger("12345678987654321");
-//		for(int i=0;i<10000000;i++){
-//			bi1 = bi1.add(bi2);
+//		BigNumber bi1 = new BigNumber("12345678987654321");
+//		BigNumber bi2 = new BigNumber("12345678987654321");
+//		for(int i=0;i<times;i++){
+//			bi1.add(bi2);
 //		}
 //		System.out.println(bi1.toString());
 //		System.out.println((System.currentTimeMillis() - start) + " ms");
 //		
 //		start = System.currentTimeMillis();
-//		long m = 12345678987654321L;
-//		long n = 12345678987654321L;
-//		for(int i=0;i<10000000;i++){
-//			m+=n;
+//		BigInteger m = new BigInteger("12345678987654321");
+//		BigInteger n = new BigInteger("12345678987654321");
+//		for(int i=0;i<times;i++){
+//			m=m.add(n);
 //		}
-//		System.out.println(m);
+//		System.out.println(m.toString());
 //		System.out.println((System.currentTimeMillis() - start) + " ms");
 		
-		BigNumber bit = new BigNumber("12345678987654321");
-		BigNumber bit2 = new BigNumber("901");
+		BigNumber bit = new BigNumber("999999");
+		BigNumber bit2 = new BigNumber("1");
 		System.out.println(bit.toString());
 		bit.add(bit2);
 		System.out.println(bit.toString());
-//		System.out.println(bit.getRest());
-//		System.out.println(bit.getO());
+		bit.sub(bit2);
+		System.out.println(bit.toString());
+//		System.out.println(bit.compareTo(bit2));
 	}
 }
