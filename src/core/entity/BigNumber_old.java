@@ -1,4 +1,4 @@
-package core;
+package core.entity;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
  * 
  */
 
-public class BigNumber {
+public class BigNumber_old {
 	
 //	int rest;
 //	int K;
@@ -27,7 +27,7 @@ public class BigNumber {
 	
 	private Map<Integer,Integer> digitMap = new HashMap<Integer,Integer>();
 	
-	public BigNumber(String str) {
+	public BigNumber_old(String str) {
 		int j=0;
 		for(int i=str.length();i>0;i-=3){
 			if(i>=3){
@@ -110,7 +110,7 @@ public class BigNumber {
 		return result;
 	}
 	
-	public int compareTo(BigNumber num) {
+	public int compareTo(BigNumber_old num) {
 		int len = digitMap.size();
 		int lenNum = num.getDigitMap().size();
 		if(len>lenNum) {
@@ -129,7 +129,7 @@ public class BigNumber {
 		return 0;
 	}
 
-	public void add(BigNumber num) {
+	public void add(BigNumber_old num) {
 		int len = digitMap.size();
 		int lenNum = num.getDigitMap().size();
 		int carry = 0;
@@ -146,7 +146,7 @@ public class BigNumber {
 		}
 	}
 	
-	public void sub(BigNumber num) throws Exception {
+	public void sub(BigNumber_old num) throws Exception {
 		if(compareTo(num)<0) {
 			throw new Exception("无法计算负数");
 		}
@@ -178,7 +178,7 @@ public class BigNumber {
 		}
 	}
 
-	public void multi(BigNumber num) {
+	public void multi(BigNumber_old num) {
 		int len = digitMap.size();
 		int lenNum = num.getDigitMap().size();
 		int carry = 0;
@@ -215,8 +215,8 @@ public class BigNumber {
 //		System.out.println(m.toString());
 //		System.out.println((System.currentTimeMillis() - start) + " ms");
 		
-		BigNumber bit = new BigNumber("999999");
-		BigNumber bit2 = new BigNumber("1");
+		BigNumber_old bit = new BigNumber_old("999999");
+		BigNumber_old bit2 = new BigNumber_old("1");
 		System.out.println(bit.toString());
 		bit.add(bit2);
 		System.out.println(bit.toString());
